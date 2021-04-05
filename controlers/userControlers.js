@@ -78,9 +78,56 @@ const avatars = async (req, res, next) => {
     .json({ status: "success", code: HttpCode.OK, avatarURL: url });
 };
 
+const current = async (req, res, next) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await servisUser.getCurrentUser(userId);
+    if (user) {
+      return res.status(HttpCode.OK).json({
+        status: "success",
+        code: HttpCode.OK,
+        data: {
+          user,
+        },
+      });
+    }
+    next({
+      status: HttpCode.UNAUTHORIZED,
+      message: "Invalid credentinals",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const verify = async (req, res, next) => {
+  try {
+    const result = await servisUser.verify(req.params);
+    if (result) {
+      return res.status(HttpCode.OK).json({
+        status: "success",
+        code: HttpCode.OK,
+        data: {
+          message: "Veryfication successful",
+        },
+      });
+    }
+    next({
+      status: HttpCode.BAD_REQUEST,
+      message:
+        "Your verification token is not valid. Contact with administration",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 module.exports = {
   reg,
   login,
   logout,
   avatars,
+  current,
+  verify,
 };

@@ -9,7 +9,7 @@ class AuthService {
 
   async login({ email }) {
     const user = await this.repository.users.findUserByEmail(email);
-    if (!user) {
+    if (!user || !user.verify) {
       return null;
     }
     const id = user.id;
